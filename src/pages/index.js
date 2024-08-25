@@ -33,6 +33,9 @@ const getRemainingCourses = async (degree, completedCourses) => {
         }
       });
     });
+    let art = 0, sci = 0;
+    fs.createReadStream("./art.csv");
+    fs.createReadStream("./sci.csv");
 
     return remainingCourses;
   } catch (error) {
@@ -52,7 +55,7 @@ function initDiagram() {
 
       "undoManager.isEnabled": true,
       layout: new go.LayeredDigraphLayout({
-              direction: 0,
+              direction: 90,
               layerSpacing: 40,
               columnSpacing: 40,
             }
@@ -85,7 +88,7 @@ function initDiagram() {
         '#094AB2'
       ],
       dragOver: '#f0f9ff',
-      link: '#FFFF00',
+      link: '#ADD8E6',
       div: '#f3f4f6'
     },
     fonts: {
@@ -106,7 +109,7 @@ function initDiagram() {
       badgeText: '#4ade80',
       shadow: '#111827',
       dragOver: '#082f49',
-      link: '#FFFF00',
+      link: '#ADD8E6',
       div: '#1f2937'
     }
   });
@@ -250,22 +253,382 @@ export default function Home() {
     <ReactDiagram
 initDiagram={initDiagram}
 divClassName='diagram-component'  
-  nodeDataArray = { [
-    {"key":"CMPUT 174","link":"https://apps.ualberta.ca/catalogue/course/cmput/174","type":"taken"},
-    {"key":"CMPUT 175","link":"https://apps.ualberta.ca/catalogue/course/cmput/175","type":"taken"},
-    {"key":"CMPUT 201","link":"https://apps.ualberta.ca/catalogue/course/cmput/201","type":"taken"},
-    {"key":"CMPUT 204","link":"https://apps.ualberta.ca/catalogue/course/cmput/204","type":"taken"},
-    {"key":"CMPUT 229","link":"https://apps.ualberta.ca/catalogue/course/cmput/229","type":"rec"},
-    {"key":"CMPUT 272","link":"https://apps.ualberta.ca/catalogue/course/cmput/272","type":"rec"},
-    {"key":"CMPUT 304","link":"https://apps.ualberta.ca/catalogue/course/math/117","type":"rec"}
-    ]}
-  linkDataArray = {[
-{"from":"CMPUT 174","to":"CMPUT 175"},
-{"from":"CMPUT 175","to":"CMPUT 201"},
-{"from":"CMPUT 201","to":"CMPUT 272"},
-{"from":"CMPUT 201","to":"CMPUT 204"},
-{"from":"CMPUT 201","to":"CMPUT 229"},
-{"from":"CMPUT 204","to":"CMPUT 304"}
+nodeDataArray = { [
+  {
+      "key": "CMPUT 174",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/174",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 175",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/175",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 191",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/191",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 195",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/195",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 200",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/200",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 201",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/201",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 204",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/204",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 206",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/206",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 210",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/210",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 229",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/229",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 250",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/250",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 256",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/256",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 261",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/261",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 267",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/267",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 272",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/272",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 274",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/274",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 275",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/275",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 291",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/291",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 300",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/300",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 301",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/301",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 302",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/302",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 304",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/304",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 307",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/307",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 308",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/308",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 312",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/312",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 313",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/313",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 325",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/325",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 328",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/328",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 331",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/331",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 333",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/333",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 340",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/340",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 350",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/350",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 355",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/355",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 361",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/361",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 365",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/365",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 366",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/366",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 367",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/367",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 379",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/379",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 382",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/382",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 401",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/401",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 402",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/402",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 404",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/404",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 411",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/411",
+      "type": "taken"
+  },
+  {
+      "key": "CMPUT 412",
+      "link": "https://apps.ualberta.ca/catalogue/course/cmput/412",
+      "type": "taken"
+  }
+]}
+linkDataArray = {[
+  {'from': 'CMPUT 174', 'to': 'CMPUT 175'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 175'},
+  {'from': 'CMPUT 174', 'to': 'CMPUT 195'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 195'},
+  {'from': 'CMPUT 191', 'to': 'CMPUT 200'},
+  {'from': 'CMPUT 195', 'to': 'CMPUT 200'},
+  {'from': 'CMPUT 174', 'to': 'CMPUT 200'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 200'},
+  {'from': 'STAT 141', 'to': 'CMPUT 200'},
+  {'from': 'STAT 151', 'to': 'CMPUT 200'},
+  {'from': 'STAT 235', 'to': 'CMPUT 200'},
+  {'from': 'STAT 265', 'to': 'CMPUT 200'},
+  {'from': 'SCI 151', 'to': 'CMPUT 200'},
+  {'from': 'MATH 181', 'to': 'CMPUT 200'},
+  {'from': 'CMPUT 267', 'to': 'CMPUT 200'},
+  {'from': 'CMPUT 175', 'to': 'CMPUT 201'},
+  {'from': 'CMPUT 175', 'to': 'CMPUT 204'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 204'},
+  {'from': 'CMPUT 272', 'to': 'CMPUT 204'},
+  {'from': 'CMPUT 101', 'to': 'CMPUT 206'},
+  {'from': 'CMPUT 174', 'to': 'CMPUT 206'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 206'},
+  {'from': 'MATH 100', 'to': 'CMPUT 206'},
+  {'from': 'MATH 117', 'to': 'CMPUT 206'},
+  {'from': 'MATH 134', 'to': 'CMPUT 206'},
+  {'from': 'MATH 144', 'to': 'CMPUT 206'},
+  {'from': 'MATH 154', 'to': 'CMPUT 206'},
+  {'from': 'STAT 141', 'to': 'CMPUT 206'},
+  {'from': 'STAT 151', 'to': 'CMPUT 206'},
+  {'from': 'STAT 235', 'to': 'CMPUT 206'},
+  {'from': 'STAT 265', 'to': 'CMPUT 206'},
+  {'from': 'SCI 151', 'to': 'CMPUT 206'},
+  {'from': 'MATH 181', 'to': 'CMPUT 206'},
+  {'from': 'CMPUT 175', 'to': 'CMPUT 229'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 229'},
+  {'from': 'CMPUT 174', 'to': 'CMPUT 256'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 256'},
+  {'from': 'STAT 141', 'to': 'CMPUT 261'},
+  {'from': 'STAT 151', 'to': 'CMPUT 261'},
+  {'from': 'STAT 235', 'to': 'CMPUT 261'},
+  {'from': 'STAT 265', 'to': 'CMPUT 261'},
+  {'from': 'SCI 151', 'to': 'CMPUT 261'},
+  {'from': 'MATH 181', 'to': 'CMPUT 261'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 261'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 261'},
+  {'from': 'CMPUT 174', 'to': 'CMPUT 267'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 267'},
+  {'from': 'CMPUT 175', 'to': 'CMPUT 267'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 267'},
+  {'from': 'CMPUT 272', 'to': 'CMPUT 267'},
+  {'from': 'STAT 141', 'to': 'CMPUT 267'},
+  {'from': 'STAT 151', 'to': 'CMPUT 267'},
+  {'from': 'STAT 235', 'to': 'CMPUT 267'},
+  {'from': 'STAT 265', 'to': 'CMPUT 267'},
+  {'from': 'SCI 151', 'to': 'CMPUT 267'},
+  {'from': 'MATH 181', 'to': 'CMPUT 267'},
+  {'from': 'MATH 100', 'to': 'CMPUT 267'},
+  {'from': 'MATH 117', 'to': 'CMPUT 267'},
+  {'from': 'MATH 134', 'to': 'CMPUT 267'},
+  {'from': 'MATH 144', 'to': 'CMPUT 267'},
+  {'from': 'MATH 154', 'to': 'CMPUT 267'},
+  {'from': 'MATH 102', 'to': 'CMPUT 267'},
+  {'from': 'MATH 125', 'to': 'CMPUT 267'},
+  {'from': 'MATH 127', 'to': 'CMPUT 267'},
+  {'from': 'CMPUT 101', 'to': 'CMPUT 272'},
+  {'from': 'CMPUT 174', 'to': 'CMPUT 272'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 272'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 275'},
+  {'from': 'CMPUT 175', 'to': 'CMPUT 291'},
+  {'from': 'CMPUT 274', 'to': 'CMPUT 291'},
+  {'from': 'CMPUT 272', 'to': 'CMPUT 291'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 291'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 291'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 301'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 301'},
+  {'from': 'CMPUT 301', 'to': 'CMPUT 302'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 304'},
+  {'from': 'MATH 225', 'to': 'CMPUT 304'},
+  {'from': 'MATH 227', 'to': 'CMPUT 304'},
+  {'from': 'MATH 228', 'to': 'CMPUT 304'},
+  {'from': 'STAT 141', 'to': 'CMPUT 304'},
+  {'from': 'STAT 151', 'to': 'CMPUT 304'},
+  {'from': 'STAT 235', 'to': 'CMPUT 304'},
+  {'from': 'STAT 265', 'to': 'CMPUT 304'},
+  {'from': 'SCI 151', 'to': 'CMPUT 304'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 307'},
+  {'from': 'CMPUT 206', 'to': 'CMPUT 307'},
+  {'from': 'MATH 225', 'to': 'CMPUT 307'},
+  {'from': 'MATH 227', 'to': 'CMPUT 307'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 308'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 308'},
+  {'from': 'MATH 102', 'to': 'CMPUT 308'},
+  {'from': 'MATH 125', 'to': 'CMPUT 308'},
+  {'from': 'MATH 127', 'to': 'CMPUT 308'},
+  {'from': 'STAT 141', 'to': 'CMPUT 308'},
+  {'from': 'STAT 151', 'to': 'CMPUT 308'},
+  {'from': 'STAT 235', 'to': 'CMPUT 308'},
+  {'from': 'STAT 265', 'to': 'CMPUT 308'},
+  {'from': 'SCI 151', 'to': 'CMPUT 308'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 312'},
+  {'from': 'CMPUT 340', 'to': 'CMPUT 312'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 313'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 313'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 313'},
+  {'from': 'CMPUT 229', 'to': 'CMPUT 313'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 325'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 325'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 325'},
+  {'from': 'CMPUT 229', 'to': 'CMPUT 325'},
+  {'from': 'CMPUT 175', 'to': 'CMPUT 328'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 328'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 331'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 331'},
+  {'from': 'CMPUT 272', 'to': 'CMPUT 331'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 333'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 333'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 340'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 340'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 350'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 350'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 350'},
+  {'from': 'CMPUT 272', 'to': 'CMPUT 355'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 361'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 361'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 361'},
+  {'from': 'CMPUT 175', 'to': 'CMPUT 365'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 365'},
+  {'from': 'CMPUT 267', 'to': 'CMPUT 365'},
+  {'from': 'CMPUT 466', 'to': 'CMPUT 365'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 366'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 366'},
+  {'from': 'CMPUT 272', 'to': 'CMPUT 366'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 367'},
+  {'from': 'CMPUT 267', 'to': 'CMPUT 367'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 379'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 379'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 379'},
+  {'from': 'CMPUT 229', 'to': 'CMPUT 379'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 382'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 382'},
+  {'from': 'CMPUT 229', 'to': 'CMPUT 382'},
+  {'from': 'CMPUT 301', 'to': 'CMPUT 401'},
+  {'from': 'CMPUT 301', 'to': 'CMPUT 402'},
+  {'from': 'CMPUT 301', 'to': 'CMPUT 404'},
+  {'from': 'CMPUT 291', 'to': 'CMPUT 404'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 411'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 411'},
+  {'from': 'CMPUT 301', 'to': 'CMPUT 411'},
+  {'from': 'CMPUT 340', 'to': 'CMPUT 411'},
+  {'from': 'CMPUT 201', 'to': 'CMPUT 412'},
+  {'from': 'CMPUT 204', 'to': 'CMPUT 412'},
+  {'from': 'CMPUT 275', 'to': 'CMPUT 412'},
+  {'from': 'CMPUT 340', 'to': 'CMPUT 412'},
 ]}
 
 />

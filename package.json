@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "csv-parse": "^5.5.6",
     "gojs": "^3.0.10",
     "gojs-react": "^1.1.2",
     "next": "14.2.6",
