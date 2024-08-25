@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import * as go from 'gojs';
+import { ReactDiagram } from 'gojs-react';
 
 const degreeRequirements = {
   "BSc Computing Science General": "/programs/gen.json",
@@ -38,6 +40,120 @@ const getRemainingCourses = async (degree, completedCourses) => {
     return [];
   }
 };
+
+function initDiagram() {
+  const myDiagram = 
+  new go.Diagram(
+    {
+      viewSize: new go.Size(1000,500),
+
+      "allowRelink": false,
+      "allowLink": false,
+
+      "undoManager.isEnabled": true,
+      layout: new go.LayeredDigraphLayout({
+              direction: 0,
+              layerSpacing: 40,
+              columnSpacing: 40,
+            }
+      ),
+      model: new go.GraphLinksModel(
+        {
+          linkKeyProperty: 'key'  // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
+        })
+    });
+  myDiagram.themeManager.set('light', {
+    colors: {
+      background: '#fff',
+      text: '#111827',
+      textHighlight: '#11a8cd',
+      subtext: '#6b7280',
+      badge: '#f0fdf4',
+      badgeBorder: '#16a34a33',
+      badgeText: '#15803d',
+      divider: '#6b7280',
+      shadow: '#9ca3af',
+      tooltip: '#1f2937',
+      levels: [
+        '#AC193D',
+        '#2672EC',
+        '#8C0095',
+        '#5133AB',
+        '#008299',
+        '#D24726',
+        '#008A00',
+        '#094AB2'
+      ],
+      dragOver: '#f0f9ff',
+      link: '#FFFF00',
+      div: '#f3f4f6'
+    },
+    fonts: {
+      name: '500 0.875rem InterVariable, sans-serif',
+      normal: '0.875rem InterVariable, sans-serif',
+      badge: '500 0.75rem InterVariable, sans-serif',
+      link: '600 0.875rem InterVariable, sans-serif'
+    }
+  });
+
+  myDiagram.themeManager.set('dark', {
+    colors: {
+      background: '#111827',
+      text: '#fff',
+      subtext: '#d1d5db',
+      badge: '#22c55e19',
+      badgeBorder: '#22c55e21',
+      badgeText: '#4ade80',
+      shadow: '#111827',
+      dragOver: '#082f49',
+      link: '#FFFF00',
+      div: '#1f2937'
+    }
+  });
+
+  myDiagram.nodeTemplate =
+    new go.Node("Auto",
+      { isShadowed: true,
+        shadowBlur: 0,
+        layerName: 'Foreground',
+        shadowOffset: new go.Point(3.5,3.5),
+        shadowColor: 'black',
+        //background: "#44CCFF",
+        doubleClick: openlink
+      }).bind("url", "link")
+    .add(
+      new go.Shape('RoundedRectangle', {
+        strokeWidth: 2,
+        fill: "#44CCFF",
+        portId: '',
+        fromLinkable: true, fromLinkableSelfNode: false, fromLinkableDuplicates: true,
+        toLinkable: true, toLinkableSelfNode: false, toLinkableDuplicates: true,
+        cursor: 'pointer'
+      }) .bind('fill', 'type', (type) => {
+          if (type === 'taken') return '#77DD77';
+          if (type === 'rec') return '#FAA0A0';
+          return 'C3B1E1';
+        }),
+      new go.TextBlock("Default Text",
+        { margin: 15, stroke: "white", font: "bold 20px sans-serif" })
+      .bind("text", "key")
+    );
+    // new go.Shape("RoundedRectangle")
+    //   .bind("figure", "fig")
+
+  myDiagram.linkTemplate = new go.Link({
+    routing: go.Routing.Orthogonal,
+    layerName: 'Background',
+    selectionAdorned: false,  // don't bother with any selection adornment
+    corner: 5
+  })
+  .add(new go.Shape({ strokeWidth: 3 }).theme('stroke', 'link')); // the link shape
+  
+  function openlink(e, obj) {
+    window.open(obj.url);
+  }
+  return myDiagram;
+}
 
 export default function Home() {
   const [degree, setDegree] = useState("");
@@ -131,6 +247,29 @@ export default function Home() {
           </ul>
         </div>
       )}
+    <ReactDiagram
+initDiagram={initDiagram}
+divClassName='diagram-component'  
+  nodeDataArray = { [
+    {"key":"CMPUT 174","link":"https://apps.ualberta.ca/catalogue/course/cmput/174","type":"taken"},
+    {"key":"CMPUT 175","link":"https://apps.ualberta.ca/catalogue/course/cmput/175","type":"taken"},
+    {"key":"CMPUT 201","link":"https://apps.ualberta.ca/catalogue/course/cmput/201","type":"taken"},
+    {"key":"CMPUT 204","link":"https://apps.ualberta.ca/catalogue/course/cmput/204","type":"taken"},
+    {"key":"CMPUT 229","link":"https://apps.ualberta.ca/catalogue/course/cmput/229","type":"rec"},
+    {"key":"CMPUT 272","link":"https://apps.ualberta.ca/catalogue/course/cmput/272","type":"rec"},
+    {"key":"CMPUT 304","link":"https://apps.ualberta.ca/catalogue/course/math/117","type":"rec"}
+    ]}
+  linkDataArray = {[
+{"from":"CMPUT 174","to":"CMPUT 175"},
+{"from":"CMPUT 175","to":"CMPUT 201"},
+{"from":"CMPUT 201","to":"CMPUT 272"},
+{"from":"CMPUT 201","to":"CMPUT 204"},
+{"from":"CMPUT 201","to":"CMPUT 229"},
+{"from":"CMPUT 204","to":"CMPUT 304"}
+]}
+
+/>
     </div>
+    
   );
 }
