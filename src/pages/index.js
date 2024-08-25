@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const degreeRequirements = {
   "BSc Computing Science General": "/programs/gen.json",
@@ -24,7 +24,7 @@ const getRemainingCourses = async (degree, completedCourses) => {
 
       list.forEach((course) => {
         if (completedCourses.includes(course)) {
-          units += 3; // assuming each course is worth 3 units
+          units += 3;
         } else if (units < requiredUnits) {
           remainingCourses.push(course);
           units += 3;
@@ -43,15 +43,23 @@ export default function Home() {
   const [degree, setDegree] = useState("");
   const [courses, setCourses] = useState("");
   const [remainingCourses, setRemainingCourses] = useState([]);
+  const [fadeIn, setFadeIn] = useState(false);
+
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const completedCourses = courses.split(",").map((course) => course.trim());
-
-    // Await the result of the getRemainingCourses function
     const remaining = await getRemainingCourses(degree, completedCourses);
     setRemainingCourses(remaining);
+    setFadeIn(true);
   };
+
+  useEffect(() => {
+    if (remainingCourses.length > 0) {
+      setFadeIn(false);
+      setTimeout(() => setFadeIn(true), 10);
+    }
+  }, [remainingCourses]);
 
   return (
     <div className="container mx-auto p-4">
@@ -61,8 +69,6 @@ export default function Home() {
           Plan your Computer Science degree at the University of Alberta
         </p>
       </header>
-
-      {/* Degree Input Form */}
       <form onSubmit={handleFormSubmit} className="space-y-4">
         <div>
           <label className="block text-uofa_green font-medium">Program:</label>
@@ -112,7 +118,7 @@ export default function Home() {
       </form>
 
       {remainingCourses.length > 0 && (
-        <div className="mt-8">
+        <div className={`mt-8 fade-in ${fadeIn ? 'fade-in-active' : ''}`}>
           <h2 className="text-2xl text-uofa_gold font-semibold">
             Remaining Courses:
           </h2>
