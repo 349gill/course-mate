@@ -33,9 +33,6 @@ const getRemainingCourses = async (degree, completedCourses) => {
         }
       });
     });
-    let art = 0, sci = 0;
-    fs.createReadStream("./art.csv");
-    fs.createReadStream("./sci.csv");
 
     return remainingCourses;
   } catch (error) {
