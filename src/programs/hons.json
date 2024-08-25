@@ -1,0 +1,38 @@
+{
+    "core": {
+        "sci": 72,
+        "art": 18,
+        "total": 120,
+        "junior": [0, 42]
+    },
+
+    "major": {
+        "intro": {
+            "units": 9,
+            "list": [
+                "CMPUT 174",
+                "CMPUT 175",
+                "CMPUT 274",
+                "CMPUT 275",
+                "CMPUT 272"
+            ]
+        },
+
+        "english": {
+            "units": 6,
+            "list": [
+                "ENGL 102",
+                "ENGL 103",
+                "ENGL 125",
+                "WRS 101",
+                "WRS 102",
+                "WRS 103"
+            ]
+        },
+
+        "300lv": {
+            "units": 24,
+            "list": []
+        }
+    }
+}
