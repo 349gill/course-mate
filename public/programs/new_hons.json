@@ -1,0 +1,125 @@
+{
+    "core": {
+        "sci": [72, 102],
+        "art": [18, 48],
+        "total": 120,
+        "junior": [0, 42]
+    },
+
+    "breadth outside science": {
+        "phys/chem": {
+            "units": 6,
+            "list": [
+                "INTD XXX",
+                "BTM XXX",
+                "BLAW XXX",
+                "BUEC XXX",
+                "FIN XXX",
+                "MARK XXX",
+                "SEM XXX",
+                "DRAMA XXX",
+                "PHIL XXX",
+                "CLASS XXX",
+                "PSYCH 105",
+                "SOC XXX",
+                "ANTHR XXX"
+
+            ]
+        },
+
+        "breadth within science": {
+            "units": 6,
+            "list": [
+                "PSYCH 104",
+                "BIOL 107",
+                "BIOL 108",
+                "EAS 100",
+                "EAS 105",
+                "ASTRO XXX",
+                "PHYS XXX",
+                "STAT XXX",
+                "MAPH XXX",
+                "PSYCH 104"
+            ]
+        },
+
+        "intro": {
+            "units": 6,
+            "list": [
+                "CMPUT 174",
+                "CMPUT 175",
+                "CMPUT 274",
+                "CMPUT 275"
+            ]
+        },
+
+        "calc1": {
+            "units": 3,
+            "list": [
+                "MATH 117",
+                "MATH 134",
+                "MATH 144",
+                "MATH 154"
+            ]
+        },
+
+        "calc2": {
+            "units": 3,
+            "list": [
+                "MATH 118",
+                "MATH 136",
+                "MATH 146",
+                "MATH 156"
+            ]
+        },
+
+        "stats": {
+            "units": 6,
+            "list": [
+                "STAT 151",
+                "STAT 252"
+            ]
+        },
+
+        "english": {
+            "units": 6,
+            "list": [
+                "ENGL 102",
+                "ENGL 103",
+                "ENGL 125",
+                "WRS 101",
+                "WRS 102",
+                "WRS 103"
+            ]
+        },
+
+        "200lv": {
+            "units": 15,
+            "list": [
+                "CMPUT 201",
+                "CMPUT 204",
+                "CMPUT 229",
+                "CMPUT 272",
+                "CMPUT 291"
+            ]
+        },
+
+        "300lv": {
+            "units": 12,
+            "list": []
+        },
+
+        "400lv": {
+            "units": 6,
+            "list": []
+        },
+
+        "ethics": {
+            "units": 3,
+            "list": [
+                "CMPUT 200",
+                "CMPUT 300"
+            ]
+        }
+    }
+}
