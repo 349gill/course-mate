@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
 import * as go from 'gojs';
 import { ReactDiagram } from 'gojs-react';
+import { useState, useEffect } from "react";
 
+// TODO: Fetch degrees
 const degreeRequirements = {
   "BSc Computing Science General": "/programs/gen.json",
   "BSc Computing Science Honors": "/programs/hons.json",
@@ -10,6 +11,7 @@ const degreeRequirements = {
   "BSc Computing Science Major (2024)": "/programs/new_major.json",
 };
 
+// TODO: Fetch courses and requirements
 const getRemainingCourses = async (degree, completedCourses) => {
   const degreePath = degreeRequirements[degree];
   if (!degreePath) return [];
@@ -41,6 +43,8 @@ const getRemainingCourses = async (degree, completedCourses) => {
   }
 };
 
+
+// TODO: Show the remaining courses only
 function initDiagram() {
   const myDiagram = 
   new go.Diagram(
@@ -159,23 +163,20 @@ export default function Home() {
   const [degree, setDegree] = useState("");
   const [courses, setCourses] = useState("");
   const [remainingCourses, setRemainingCourses] = useState([]);
-  const [fadeIn, setFadeIn] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const completedCourses = courses.split(",").map((course) => course.trim());
+    if (!degree) {
+      setErrorMessage("Please select a program."); // Set error message if degree is not selected
+      return;
+    }
+
+    const completedCourses = courses.split(",").map((course) => course.replace(/(CMPUT)\s?(\d{3})/gi, "$1 $2").trim().toUpperCase());
     const remaining = await getRemainingCourses(degree, completedCourses);
     setRemainingCourses(remaining);
-    setFadeIn(true);
+    setErrorMessage("");
   };
-
-  useEffect(() => {
-    if (remainingCourses.length > 0) {
-      setFadeIn(false);
-      setTimeout(() => setFadeIn(true), 10);
-    }
-  }, [remainingCourses]);
 
   return (
     <div className="container mx-auto p-4">
@@ -185,13 +186,13 @@ export default function Home() {
           Plan your Computer Science degree at the University of Alberta
         </p>
       </header>
-      <form onSubmit={handleFormSubmit} className="space-y-4">
-        <div>
+      <form onSubmit={handleFormSubmit} className="space-y-4 max-w-lg mx-auto">
+        <div className="relative">
           <label className="block text-uofa_green font-medium">Program:</label>
           <select
             value={degree}
             onChange={(e) => setDegree(e.target.value)}
-            className="p-2 border border-gray-300 rounded w-full"
+            className="p-3 bg-white border-2 border-gray-300 rounded-md shadow-sm w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
           >
             <option value="">Select your degree</option>
             <option value="BSc Computing Science General">
@@ -210,32 +211,35 @@ export default function Home() {
               BSc Computing Science Major (2024)
             </option>
           </select>
+          {errorMessage && (
+            <p className="text-red-600 mt-2 font-semibold">{errorMessage}</p>
+          )}
         </div>
 
         <div>
-          <label className="block font-medium">
+          <label className="block text-lg font-semibold">
             Completed Courses (comma separated):
           </label>
           <input
             type="text"
             value={courses}
             onChange={(e) => setCourses(e.target.value)}
-            className="p-2 border border-gray-300 rounded w-full"
+            className="p-3 bg-white border-2 border-gray-300 rounded-md shadow-sm w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
             placeholder="e.g., CMPUT 174, CMPUT 175"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-green-800 text-white p-2 rounded w-full hover:bg-green-900"
+          className="w-full py-3 px-4 bg-green-800 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-transform transform hover:scale-105"
         >
           Submit
         </button>
       </form>
 
       {remainingCourses.length > 0 && (
-        <div className={`mt-8 fade-in ${fadeIn ? 'fade-in-active' : ''}`}>
-          <h2 className="text-2xl text-uofa_gold font-semibold">
+        <div className={`mt-8}`}>
+          <h2 className="text-2xl font-semibold text-green-800">
             Remaining Courses:
           </h2>
           <ul className="list-disc list-inside">
