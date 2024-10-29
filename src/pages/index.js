@@ -161,7 +161,7 @@ export default function Home() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!degree) {
-      setErrorMessage("Please select a program."); // Set error message if degree is not selected
+      setErrorMessage("Please select a program.");
       return;
     }
 
@@ -176,7 +176,7 @@ export default function Home() {
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold text-green-800">CourseMate</h1>
         <p className="text-lg text-gray-600">
-          Plan your Computer Science degree at the University of Alberta
+          Plan your Science degree at University of Alberta
         </p>
       </header>
       <form onSubmit={handleFormSubmit} className="space-y-4 max-w-lg mx-auto">
