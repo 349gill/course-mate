@@ -3,11 +3,10 @@ import { ReactDiagram } from 'gojs-react';
 import { useState, useEffect } from "react";
 
 const degreeRequirements = {
-  "BSc Computing Science General": "/programs/gen.json",
-  "BSc Computing Science Honors": "/programs/hons.json",
-  "BSc Computing Science Specialization": "/programs/spec.json",
-  "BSc Computing Science Honors (2024)": "/programs/new_hons.json",
-  "BSc Computing Science Major (2024)": "/programs/new_major.json",
+  "Bachelor of Science General": "/programs/gen.json",
+  "Bachelor of Science Honors": "/programs/hons.json",
+  "Bachelor of Science Specialization": "/programs/spec.json",
+  "Bachelor of Science (Major and Honors)": "/programs/new_major.json",
 };
 
 const getRemainingCourses = async (degree, completedCourses) => {
