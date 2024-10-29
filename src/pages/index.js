@@ -2,7 +2,6 @@ import * as go from 'gojs';
 import { ReactDiagram } from 'gojs-react';
 import { useState, useEffect } from "react";
 
-// TODO: Fetch degrees
 const degreeRequirements = {
   "BSc Computing Science General": "/programs/gen.json",
   "BSc Computing Science Honors": "/programs/hons.json",
@@ -11,7 +10,6 @@ const degreeRequirements = {
   "BSc Computing Science Major (2024)": "/programs/new_major.json",
 };
 
-// TODO: Fetch courses and requirements
 const getRemainingCourses = async (degree, completedCourses) => {
   const degreePath = degreeRequirements[degree];
   if (!degreePath) return [];
@@ -43,8 +41,6 @@ const getRemainingCourses = async (degree, completedCourses) => {
   }
 };
 
-
-// TODO: Show the remaining courses only
 function initDiagram() {
   const myDiagram = 
   new go.Diagram(
@@ -63,7 +59,7 @@ function initDiagram() {
       ),
       model: new go.GraphLinksModel(
         {
-          linkKeyProperty: 'key'  // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
+          linkKeyProperty: 'key'
         })
     });
   myDiagram.themeManager.set('light', {
@@ -122,7 +118,6 @@ function initDiagram() {
         layerName: 'Foreground',
         shadowOffset: new go.Point(3.5,3.5),
         shadowColor: 'black',
-        //background: "#44CCFF",
         doubleClick: openlink
       }).bind("url", "link")
     .add(
@@ -142,13 +137,11 @@ function initDiagram() {
         { margin: 15, stroke: "white", font: "bold 20px sans-serif" })
       .bind("text", "key")
     );
-    // new go.Shape("RoundedRectangle")
-    //   .bind("figure", "fig")
 
   myDiagram.linkTemplate = new go.Link({
     routing: go.Routing.Orthogonal,
     layerName: 'Background',
-    selectionAdorned: false,  // don't bother with any selection adornment
+    selectionAdorned: false,
     corner: 5
   })
   .add(new go.Shape({ strokeWidth: 3 }).theme('stroke', 'link')); // the link shape
