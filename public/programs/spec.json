@@ -1,44 +1,47 @@
 {
-    "core": {
-        "sci": 72,
-        "art": 18,
-        "total": 120,
-        "junior": [0, 42]
+    "Core": {
+        "Faculty of Science": [72, 102],
+        "Faculty of Art": [18, 48],
+        "Total": 120,
+        "Junior": [0, 42]
     },
 
-    "major": {
-        "intro": {
-            "units": 6,
+    "Major": {
+        "Junior": {
+            "units": 9,
             "list": [
                 "CMPUT 174",
-                "CMPUT 175"
-            ]
-        },
-        "calc1": {
-            "units": 3,
-            "list": [
-                "MATH 117",
-                "MATH 134",
-                "MATH 144",
-                "MATH 154"
-            ]
-        },
-        "calc2": {
-            "units": 3,
-            "list": [
-                "MATH 118",
-                "MATH 136",
-                "MATH 146",
-                "MATH 156"
-            ]
-        },
-        "algebra": {
-            "units": 3,
-            "list": [
+                "CMPUT 175",
                 "MATH 125"
             ]
         },
-        "english": {
+
+        "Mathematics": {
+            "units": 6,
+            "list": [
+                "MATH 117",
+                "MATH 118",
+                "MATH 134",
+                "MATH 136",
+                "MATH 144",
+                "MATH 146",
+                "MATH 154",
+                "MATH 156"
+            ]
+        },
+
+        "Statistics": {
+            "units": 6,
+            "list": [
+                "STAT 151",
+                "STAT 252",
+                "STAT 235",
+                "STAT 265",
+                "STAT 266"
+            ]
+        },
+
+        "English": {
             "units": 6,
             "list": [
                 "ENGL 102",
@@ -49,7 +52,8 @@
                 "WRS 103"
             ]
         },
-        "200lv": {
+
+        "200-level": {
             "units": 6,
             "list": [
                 "CMPUT 201",
@@ -59,17 +63,10 @@
                 "CMPUT 291"
             ]
         },
-        "300lv": {
-            "units": 24,
-            "list": []
-        },
 
-        "stats": {
-            "units": 6,
-            "list": [
-                "STAT 151",
-                "STAT 252"
-            ]
+        "300-level": {
+            "units": 24,
+            "list": "CMPUT 300..."
         }
     }
 }

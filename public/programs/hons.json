@@ -1,24 +1,22 @@
 {
-    "core": {
-        "sci": 72,
-        "art": 18,
-        "total": 120,
-        "junior": [0, 42]
+    "Core": {
+        "Faculty of Science": [72, 102],
+        "Faculty of Art": [18, 48],
+        "Total": 120,
+        "Junior": [0, 42]
     },
 
-    "major": {
-        "intro": {
+    "Major": {
+        "Year 1": {
             "units": 9,
             "list": [
-                "CMPUT 174",
-                "CMPUT 175",
                 "CMPUT 274",
                 "CMPUT 275",
                 "CMPUT 272"
             ]
         },
 
-        "english": {
+        "English": {
             "units": 6,
             "list": [
                 "ENGL 102",
@@ -30,9 +28,14 @@
             ]
         },
 
-        "300lv": {
-            "units": 24,
-            "list": []
+        "300-level": {
+            "units": 15,
+            "list": "CMPUT 300..."
+        },
+
+        "400-level": {
+            "units": 12,
+            "list": "CMPUT 400..."
         }
     }
 }

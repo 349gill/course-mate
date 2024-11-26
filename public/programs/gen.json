@@ -1,13 +1,33 @@
 {
-    "core": {
-        "sci": [72, 102],
-        "art": [18, 48],
-        "total": 120,
-        "junior": [0, 42]
+    "Core": {
+        "Faculty of Science": [72, 102],
+        "Faculty of Art": [18, 48],
+        "Total": 120,
+        "Junior": [0, 42]
     },
 
-    "major": {
-        "phys/chem": {
+    "Major": {
+        "Mathematics": {
+            "units": 6,
+            "list": [
+                "CMPUT 101",
+                "CMPUT 174",
+                "CMPUT 175",
+                "MATH 117",
+                "MATH 118",
+                "MATH 125",
+                "MATH 127",
+                "MATH 134",
+                "MATH 136",
+                "MATH 144",
+                "MATH 146",
+                "MATH 154",
+                "MATH 156",
+                "STAT 151"
+            ]
+        },
+
+        "Physics and Chemistry": {
             "units": 6,
             "list": [
                 "ASTRO 101",
@@ -23,7 +43,7 @@
             ]
         },
 
-        "biol": {
+        "Biology": {
             "units": 6,
             "list": [
                 "PSYCH 104",
@@ -34,7 +54,7 @@
             ]
         },
 
-        "intro": {
+        "100-level": {
             "units": 6,
             "list": [
                 "CMPUT 174",
@@ -42,7 +62,7 @@
             ]
         },
 
-        "english": {
+        "English": {
             "units": 6,
             "list": [
                 "ENGL 102",
@@ -54,7 +74,7 @@
             ]
         },
 
-        "200lv": {
+        "200-level": {
             "units": 6,
             "list": [
                 "CMPUT 201",
@@ -65,9 +85,9 @@
             ]
         },
 
-        "300lv": {
+        "300-level": {
             "units": 12,
-            "list": []
+            "list": "CMPUT 300..."
         }
     }
 }
