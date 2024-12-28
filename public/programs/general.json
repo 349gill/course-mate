@@ -7,7 +7,7 @@
     },
 
     "Major": {
-        "Mathematics": {
+        "Formal sciences": {
             "units": 6,
             "list": [
                 "CMPUT 101",
@@ -87,7 +87,7 @@
 
         "300-level": {
             "units": 12,
-            "list": "CMPUT 300..."
+            "list": ["CMPUT 300..."]
         }
     }
 }

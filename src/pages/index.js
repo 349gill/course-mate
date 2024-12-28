@@ -1,153 +1,99 @@
-import * as go from 'gojs';
-import { ReactDiagram } from 'gojs-react';
-import { useState, useEffect } from "react";
+import * as go from "gojs";
+import { ReactDiagram } from "gojs-react";
+import { React, useState, useEffect, useRef } from "react";
+
+import General from "/public/programs/general.json";
+import Honors from "/public/programs/honors.json";
+import Spec from "/public/programs/spec.json";
 
 const degreeRequirements = {
-  "Bachelor of Science General": "/programs/gen.json",
-  "Bachelor of Science Honors": "/programs/hons.json",
-  "Bachelor of Science Specialization": "/programs/spec.json",
-  "Bachelor of Science (Major and Honors)": "/programs/new_major.json",
+  "Bachelor of Science General": General,
+  "Bachelor of Science Honors": Honors,
+  "Bachelor of Science Specialization": Spec,
 };
 
-const getRemainingCourses = async (degree, completedCourses) => {
-  const degreePath = degreeRequirements[degree];
-  if (!degreePath) return [];
+const getRemainingCourses = (degree, completedCourses) => {
+  const response = degreeRequirements[degree];
 
-  try {
-    const response = await fetch(degreePath);
-    const degreeData = await response.json();
-
-    const remainingCourses = [];
-
-    Object.keys(degreeData.major).forEach((category) => {
-      let units = 0;
-      const { list, units: requiredUnits } = degreeData.major[category];
-
-      list.forEach((course) => {
-        if (completedCourses.includes(course)) {
-          units += 3;
-        } else if (units < requiredUnits) {
-          remainingCourses.push(course);
-          units += 3;
-        }
-      });
-    });
-
-    return remainingCourses;
-  } catch (error) {
-    console.error("Error fetching degree requirements.", error);
-    return [];
+  if (!response || !response.Major) {
+    return {};
   }
+
+  let remainingCourses = {};
+
+  for (const subheading in response.Major) {
+    if (response.Major[subheading] && response.Major[subheading].list) {
+      const intersection = response.Major[subheading].list.filter((course) =>
+        completedCourses.includes(course)
+      );
+
+      const unitsLeft =
+        response.Major[subheading].units - intersection.length * 3;
+      if (unitsLeft > 0) {
+        remainingCourses[`${subheading}: ${unitsLeft} units`] = response.Major[
+          subheading
+        ].list.filter((course) => !intersection.includes(course));
+      }
+    }
+  }
+
+  return remainingCourses;
 };
 
 function initDiagram() {
-  const myDiagram = 
-  new go.Diagram(
+  const $ = go.GraphObject.make;
+  const myDiagram = $(go.Diagram, {
+    "undoManager.isEnabled": true,
+    layout: $(go.LayeredDigraphLayout, {
+      direction: 90,
+      layerSpacing: 40,
+      columnSpacing: 40,
+    }),
+    model: new go.GraphLinksModel({
+      linkKeyProperty: "key",
+    }),
+  });
+
+  myDiagram.nodeTemplate = $(
+    go.Node,
+    "Auto",
     {
-      viewSize: new go.Size(1000,500),
-
-      "allowRelink": false,
-      "allowLink": false,
-
-      "undoManager.isEnabled": true,
-      layout: new go.LayeredDigraphLayout({
-              direction: 90,
-              layerSpacing: 40,
-              columnSpacing: 40,
-            }
-      ),
-      model: new go.GraphLinksModel(
-        {
-          linkKeyProperty: 'key'
-        })
-    });
-  myDiagram.themeManager.set('light', {
-    colors: {
-      background: '#fff',
-      text: '#111827',
-      textHighlight: '#11a8cd',
-      subtext: '#6b7280',
-      badge: '#f0fdf4',
-      badgeBorder: '#16a34a33',
-      badgeText: '#15803d',
-      divider: '#6b7280',
-      shadow: '#9ca3af',
-      tooltip: '#1f2937',
-      levels: [
-        '#AC193D',
-        '#2672EC',
-        '#8C0095',
-        '#5133AB',
-        '#008299',
-        '#D24726',
-        '#008A00',
-        '#094AB2'
-      ],
-      dragOver: '#f0f9ff',
-      link: '#ADD8E6',
-      div: '#f3f4f6'
+      isShadowed: true,
+      shadowBlur: 0,
+      shadowOffset: new go.Point(3.5, 3.5),
+      shadowColor: "rgba(0,0,0,0.3)",
     },
-    fonts: {
-      name: '500 0.875rem InterVariable, sans-serif',
-      normal: '0.875rem InterVariable, sans-serif',
-      badge: '500 0.75rem InterVariable, sans-serif',
-      link: '600 0.875rem InterVariable, sans-serif'
-    }
-  });
-
-  myDiagram.themeManager.set('dark', {
-    colors: {
-      background: '#111827',
-      text: '#fff',
-      subtext: '#d1d5db',
-      badge: '#22c55e19',
-      badgeBorder: '#22c55e21',
-      badgeText: '#4ade80',
-      shadow: '#111827',
-      dragOver: '#082f49',
-      link: '#ADD8E6',
-      div: '#1f2937'
-    }
-  });
-
-  myDiagram.nodeTemplate =
-    new go.Node("Auto",
-      { isShadowed: true,
-        shadowBlur: 0,
-        layerName: 'Foreground',
-        shadowOffset: new go.Point(3.5,3.5),
-        shadowColor: 'black',
-        doubleClick: openlink
-      }).bind("url", "link")
-    .add(
-      new go.Shape('RoundedRectangle', {
+    $(
+      go.Shape,
+      "RoundedRectangle",
+      {
         strokeWidth: 2,
-        fill: "#44CCFF",
-        portId: '',
-        fromLinkable: true, fromLinkableSelfNode: false, fromLinkableDuplicates: true,
-        toLinkable: true, toLinkableSelfNode: false, toLinkableDuplicates: true,
-        cursor: 'pointer'
-      }) .bind('fill', 'type', (type) => {
-          if (type === 'taken') return '#77DD77';
-          if (type === 'rec') return '#FAA0A0';
-          return 'C3B1E1';
-        }),
-      new go.TextBlock("Default Text",
-        { margin: 15, stroke: "white", font: "bold 20px sans-serif" })
-      .bind("text", "key")
-    );
+        fill: "white",
+      },
+      new go.Binding("fill", "completed", (completed) =>
+        completed === 1 ? "#77DD77" : "#44CCFF"
+      )
+    ),
+    $(
+      go.TextBlock,
+      {
+        margin: 15,
+        stroke: "#000",
+        font: "bold 16px sans-serif",
+      },
+      new go.Binding("text", "key")
+    )
+  );
 
-  myDiagram.linkTemplate = new go.Link({
-    routing: go.Routing.Orthogonal,
-    layerName: 'Background',
-    selectionAdorned: false,
-    corner: 5
-  })
-  .add(new go.Shape({ strokeWidth: 3 }).theme('stroke', 'link')); // the link shape
-  
-  function openlink(e, obj) {
-    window.open(obj.url);
-  }
+  myDiagram.linkTemplate = $(
+    go.Link,
+    {
+      routing: go.Link.Orthogonal,
+      corner: 5,
+    },
+    $(go.Shape, { strokeWidth: 2, stroke: "#555" })
+  );
+
   return myDiagram;
 }
 
@@ -157,6 +103,11 @@ export default function Home() {
   const [remainingCourses, setRemainingCourses] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [nodeDataArray, setNodeDataArray] = useState([]);
+  const [linkDataArray, setLinkDataArray] = useState([]);
+
+  const remainingCoursesRef = useRef(null);
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!degree) {
@@ -164,10 +115,51 @@ export default function Home() {
       return;
     }
 
-    const completedCourses = courses.split(",").map((course) => course.replace(/(CMPUT)\s?(\d{3})/gi, "$1 $2").trim().toUpperCase());
+    const completedCourses = courses.split(",").map((course) =>
+      course
+        .replace(/([A-Za-z]{2, 6})\s?(\d{3})/gi, "$1 $2")
+        .trim()
+        .toUpperCase()
+    );
+
     const remaining = await getRemainingCourses(degree, completedCourses);
     setRemainingCourses(remaining);
-    setErrorMessage("");
+
+    const nodeDataArray = [];
+    const linkDataArray = [];
+
+    const remainingCoursesFlat = Object.values(remaining).flat();
+
+    let link = 0;
+
+    for (const item of remainingCoursesFlat) {
+      nodeDataArray.push({ key: item, completed: 0 });
+      const prerequisites = await prerequisiteInfo(item);
+
+      if (Array.isArray(prerequisites)) {
+        for (const course of prerequisites) {
+          nodeDataArray.push({ key: item, completed: 0 });
+          linkDataArray.push({ from: course, to: item, key: link++ });
+        }
+      }
+    }
+
+    for (const item of completedCourses) {
+      nodeDataArray.push({ key: item, completed: 1 });
+      const prerequisites = await prerequisiteInfo(item);
+
+      if (Array.isArray(prerequisites)) {
+        for (const course of prerequisites) {
+          nodeDataArray.push({ key: item, completed: 1 });
+          linkDataArray.push({ from: course, to: item, key: link++ });
+        }
+      }
+    }
+
+    setNodeDataArray(nodeDataArray);
+    setLinkDataArray(linkDataArray);
+
+    remainingCoursesRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -180,44 +172,40 @@ export default function Home() {
       </header>
       <form onSubmit={handleFormSubmit} className="space-y-4 max-w-lg mx-auto">
         <div className="relative">
-          <label className="block text-uofa_green font-medium">Program:</label>
           <select
             value={degree}
-            onChange={(e) => setDegree(e.target.value)}
+            onChange={(e) => {
+              setDegree(e.target.value);
+              if (e.target.value) {
+                setErrorMessage("");
+              }
+            }}
             className="p-3 bg-white border-2 border-gray-300 rounded-md shadow-sm w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
           >
             <option value="">Select your degree</option>
-            <option value="BSc Computing Science General">
-              BSc Computing Science General
+            <option value="Bachelor of Science General">
+              Bachelor of Science General
             </option>
-            <option value="BSc Computing Science Honors">
-              BSc Computing Science Honors
+            <option value="Bachelor of Science Honors">
+              Bachelor of Science Honors
             </option>
-            <option value="BSc Computing Science Specialization">
-              BSc Computing Science Specialization
-            </option>
-            <option value="BSc Computing Science Honors (2024)">
-              BSc Computing Science Honors (2024)
-            </option>
-            <option value="BSc Computing Science Major (2024)">
-              BSc Computing Science Major (2024)
+            <option value="Bachelor of Science Specialization">
+              Bachelor of Science Specialization
             </option>
           </select>
+
           {errorMessage && (
             <p className="text-red-600 mt-2 font-semibold">{errorMessage}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-lg font-semibold">
-            Completed Courses (comma separated):
-          </label>
           <input
             type="text"
             value={courses}
             onChange={(e) => setCourses(e.target.value)}
             className="p-3 bg-white border-2 border-gray-300 rounded-md shadow-sm w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
-            placeholder="e.g., CMPUT 174, CMPUT 175"
+            placeholder="Add completed courses (e.g., CMPUT 174, MATH 144)"
           />
         </div>
 
@@ -229,403 +217,74 @@ export default function Home() {
         </button>
       </form>
 
-      {remainingCourses.length > 0 && (
-        <div className={`mt-8}`}>
-          <h2 className="text-2xl font-semibold text-green-800">
-            Remaining Courses:
-          </h2>
-          <ul className="list-disc list-inside">
-            {remainingCourses.map((course, index) => (
-              <li key={index} className="text-lg">
-                {course}
-              </li>
+      <br></br>
+
+      <div className="flex-1" ref={remainingCoursesRef}>
+        <RemainingCourses courses={remainingCourses} />
+      </div>
+
+      <RenderGraph
+        nodeDataArray={nodeDataArray}
+        linkDataArray={linkDataArray}
+      />
+    </div>
+  );
+}
+
+const RenderGraph = ({ nodeDataArray, linkDataArray }) => {
+  return (
+    <div style={{ width: "100%", height: "500px", border: "1px solid #ccc" }}>
+      <ReactDiagram
+        initDiagram={initDiagram}
+        divClassName="diagram-component"
+        nodeDataArray={nodeDataArray}
+        linkDataArray={linkDataArray}
+        className="h-full w-full"
+      />
+    </div>
+  );
+};
+
+const RemainingCourses = ({ courses }) => {
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    setAnimate(false);
+    const timeout = setTimeout(() => setAnimate(true), 250);
+    return () => clearTimeout(timeout);
+  }, [courses]);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {Object.entries(courses).map(([category, items], index) => (
+        <div
+          key={index}
+          style={{
+            opacity: animate ? 1 : 0,
+            transform: animate ? "translateY(0)" : "translateY(25px)",
+            transition: "opacity 0.5s ease, transform 0.5s ease",
+          }}
+          className="bg-gray-100 p-4 rounded-md shadow"
+        >
+          <h3 className="text-lg font-medium mb-2">{category}</h3>
+          <ul className="space-y-2">
+            {items.map((item, itemIndex) => (
+              <li key={itemIndex}>{item}</li>
             ))}
           </ul>
         </div>
-      )}
-    <ReactDiagram
-initDiagram={initDiagram}
-divClassName='diagram-component'  
-nodeDataArray = { [
-  {
-      "key": "CMPUT 174",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/174",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 175",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/175",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 191",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/191",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 195",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/195",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 200",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/200",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 201",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/201",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 204",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/204",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 206",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/206",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 210",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/210",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 229",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/229",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 250",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/250",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 256",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/256",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 261",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/261",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 267",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/267",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 272",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/272",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 274",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/274",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 275",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/275",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 291",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/291",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 300",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/300",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 301",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/301",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 302",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/302",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 304",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/304",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 307",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/307",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 308",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/308",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 312",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/312",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 313",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/313",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 325",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/325",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 328",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/328",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 331",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/331",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 333",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/333",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 340",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/340",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 350",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/350",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 355",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/355",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 361",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/361",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 365",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/365",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 366",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/366",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 367",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/367",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 379",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/379",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 382",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/382",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 401",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/401",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 402",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/402",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 404",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/404",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 411",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/411",
-      "type": "taken"
-  },
-  {
-      "key": "CMPUT 412",
-      "link": "https://apps.ualberta.ca/catalogue/course/cmput/412",
-      "type": "taken"
-  }
-]}
-linkDataArray = {[
-  {'from': 'CMPUT 174', 'to': 'CMPUT 175'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 175'},
-  {'from': 'CMPUT 174', 'to': 'CMPUT 195'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 195'},
-  {'from': 'CMPUT 191', 'to': 'CMPUT 200'},
-  {'from': 'CMPUT 195', 'to': 'CMPUT 200'},
-  {'from': 'CMPUT 174', 'to': 'CMPUT 200'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 200'},
-  {'from': 'STAT 141', 'to': 'CMPUT 200'},
-  {'from': 'STAT 151', 'to': 'CMPUT 200'},
-  {'from': 'STAT 235', 'to': 'CMPUT 200'},
-  {'from': 'STAT 265', 'to': 'CMPUT 200'},
-  {'from': 'SCI 151', 'to': 'CMPUT 200'},
-  {'from': 'MATH 181', 'to': 'CMPUT 200'},
-  {'from': 'CMPUT 267', 'to': 'CMPUT 200'},
-  {'from': 'CMPUT 175', 'to': 'CMPUT 201'},
-  {'from': 'CMPUT 175', 'to': 'CMPUT 204'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 204'},
-  {'from': 'CMPUT 272', 'to': 'CMPUT 204'},
-  {'from': 'CMPUT 101', 'to': 'CMPUT 206'},
-  {'from': 'CMPUT 174', 'to': 'CMPUT 206'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 206'},
-  {'from': 'MATH 100', 'to': 'CMPUT 206'},
-  {'from': 'MATH 117', 'to': 'CMPUT 206'},
-  {'from': 'MATH 134', 'to': 'CMPUT 206'},
-  {'from': 'MATH 144', 'to': 'CMPUT 206'},
-  {'from': 'MATH 154', 'to': 'CMPUT 206'},
-  {'from': 'STAT 141', 'to': 'CMPUT 206'},
-  {'from': 'STAT 151', 'to': 'CMPUT 206'},
-  {'from': 'STAT 235', 'to': 'CMPUT 206'},
-  {'from': 'STAT 265', 'to': 'CMPUT 206'},
-  {'from': 'SCI 151', 'to': 'CMPUT 206'},
-  {'from': 'MATH 181', 'to': 'CMPUT 206'},
-  {'from': 'CMPUT 175', 'to': 'CMPUT 229'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 229'},
-  {'from': 'CMPUT 174', 'to': 'CMPUT 256'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 256'},
-  {'from': 'STAT 141', 'to': 'CMPUT 261'},
-  {'from': 'STAT 151', 'to': 'CMPUT 261'},
-  {'from': 'STAT 235', 'to': 'CMPUT 261'},
-  {'from': 'STAT 265', 'to': 'CMPUT 261'},
-  {'from': 'SCI 151', 'to': 'CMPUT 261'},
-  {'from': 'MATH 181', 'to': 'CMPUT 261'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 261'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 261'},
-  {'from': 'CMPUT 174', 'to': 'CMPUT 267'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 267'},
-  {'from': 'CMPUT 175', 'to': 'CMPUT 267'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 267'},
-  {'from': 'CMPUT 272', 'to': 'CMPUT 267'},
-  {'from': 'STAT 141', 'to': 'CMPUT 267'},
-  {'from': 'STAT 151', 'to': 'CMPUT 267'},
-  {'from': 'STAT 235', 'to': 'CMPUT 267'},
-  {'from': 'STAT 265', 'to': 'CMPUT 267'},
-  {'from': 'SCI 151', 'to': 'CMPUT 267'},
-  {'from': 'MATH 181', 'to': 'CMPUT 267'},
-  {'from': 'MATH 100', 'to': 'CMPUT 267'},
-  {'from': 'MATH 117', 'to': 'CMPUT 267'},
-  {'from': 'MATH 134', 'to': 'CMPUT 267'},
-  {'from': 'MATH 144', 'to': 'CMPUT 267'},
-  {'from': 'MATH 154', 'to': 'CMPUT 267'},
-  {'from': 'MATH 102', 'to': 'CMPUT 267'},
-  {'from': 'MATH 125', 'to': 'CMPUT 267'},
-  {'from': 'MATH 127', 'to': 'CMPUT 267'},
-  {'from': 'CMPUT 101', 'to': 'CMPUT 272'},
-  {'from': 'CMPUT 174', 'to': 'CMPUT 272'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 272'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 275'},
-  {'from': 'CMPUT 175', 'to': 'CMPUT 291'},
-  {'from': 'CMPUT 274', 'to': 'CMPUT 291'},
-  {'from': 'CMPUT 272', 'to': 'CMPUT 291'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 291'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 291'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 301'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 301'},
-  {'from': 'CMPUT 301', 'to': 'CMPUT 302'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 304'},
-  {'from': 'MATH 225', 'to': 'CMPUT 304'},
-  {'from': 'MATH 227', 'to': 'CMPUT 304'},
-  {'from': 'MATH 228', 'to': 'CMPUT 304'},
-  {'from': 'STAT 141', 'to': 'CMPUT 304'},
-  {'from': 'STAT 151', 'to': 'CMPUT 304'},
-  {'from': 'STAT 235', 'to': 'CMPUT 304'},
-  {'from': 'STAT 265', 'to': 'CMPUT 304'},
-  {'from': 'SCI 151', 'to': 'CMPUT 304'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 307'},
-  {'from': 'CMPUT 206', 'to': 'CMPUT 307'},
-  {'from': 'MATH 225', 'to': 'CMPUT 307'},
-  {'from': 'MATH 227', 'to': 'CMPUT 307'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 308'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 308'},
-  {'from': 'MATH 102', 'to': 'CMPUT 308'},
-  {'from': 'MATH 125', 'to': 'CMPUT 308'},
-  {'from': 'MATH 127', 'to': 'CMPUT 308'},
-  {'from': 'STAT 141', 'to': 'CMPUT 308'},
-  {'from': 'STAT 151', 'to': 'CMPUT 308'},
-  {'from': 'STAT 235', 'to': 'CMPUT 308'},
-  {'from': 'STAT 265', 'to': 'CMPUT 308'},
-  {'from': 'SCI 151', 'to': 'CMPUT 308'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 312'},
-  {'from': 'CMPUT 340', 'to': 'CMPUT 312'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 313'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 313'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 313'},
-  {'from': 'CMPUT 229', 'to': 'CMPUT 313'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 325'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 325'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 325'},
-  {'from': 'CMPUT 229', 'to': 'CMPUT 325'},
-  {'from': 'CMPUT 175', 'to': 'CMPUT 328'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 328'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 331'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 331'},
-  {'from': 'CMPUT 272', 'to': 'CMPUT 331'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 333'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 333'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 340'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 340'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 350'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 350'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 350'},
-  {'from': 'CMPUT 272', 'to': 'CMPUT 355'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 361'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 361'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 361'},
-  {'from': 'CMPUT 175', 'to': 'CMPUT 365'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 365'},
-  {'from': 'CMPUT 267', 'to': 'CMPUT 365'},
-  {'from': 'CMPUT 466', 'to': 'CMPUT 365'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 366'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 366'},
-  {'from': 'CMPUT 272', 'to': 'CMPUT 366'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 367'},
-  {'from': 'CMPUT 267', 'to': 'CMPUT 367'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 379'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 379'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 379'},
-  {'from': 'CMPUT 229', 'to': 'CMPUT 379'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 382'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 382'},
-  {'from': 'CMPUT 229', 'to': 'CMPUT 382'},
-  {'from': 'CMPUT 301', 'to': 'CMPUT 401'},
-  {'from': 'CMPUT 301', 'to': 'CMPUT 402'},
-  {'from': 'CMPUT 301', 'to': 'CMPUT 404'},
-  {'from': 'CMPUT 291', 'to': 'CMPUT 404'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 411'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 411'},
-  {'from': 'CMPUT 301', 'to': 'CMPUT 411'},
-  {'from': 'CMPUT 340', 'to': 'CMPUT 411'},
-  {'from': 'CMPUT 201', 'to': 'CMPUT 412'},
-  {'from': 'CMPUT 204', 'to': 'CMPUT 412'},
-  {'from': 'CMPUT 275', 'to': 'CMPUT 412'},
-  {'from': 'CMPUT 340', 'to': 'CMPUT 412'},
-]}
-
-/>
+      ))}
     </div>
-    
   );
-}
+};
+
+const prerequisiteInfo = async (course) => {
+  if (!course) return [];
+  try {
+    const response = await fetch(`/api/${encodeURIComponent(course)}`);
+    const page = await response.json();
+    return page.courses;
+  } catch (Error) {
+    return [];
+  }
+};

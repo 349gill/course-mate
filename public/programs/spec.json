@@ -66,7 +66,7 @@
 
         "300-level": {
             "units": 24,
-            "list": "CMPUT 300..."
+            "list": ["CMPUT 300..."]
         }
     }
 }

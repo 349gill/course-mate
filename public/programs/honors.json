@@ -30,12 +30,12 @@
 
         "300-level": {
             "units": 15,
-            "list": "CMPUT 300..."
+            "list": ["CMPUT 300..."]
         },
 
         "400-level": {
             "units": 12,
-            "list": "CMPUT 400..."
+            "list": ["CMPUT 400..."]
         }
     }
 }
