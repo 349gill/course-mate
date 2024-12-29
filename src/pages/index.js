@@ -41,59 +41,121 @@ const getRemainingCourses = (degree, completedCourses) => {
 };
 
 function initDiagram() {
-  const $ = go.GraphObject.make;
-  const myDiagram = $(go.Diagram, {
+  const myDiagram = new go.Diagram({
+    viewSize: new go.Size(800, 500),
+
+    allowRelink: false,
+    allowLink: false,
+
     "undoManager.isEnabled": true,
-    layout: $(go.LayeredDigraphLayout, {
-      direction: 90,
+    layout: new go.LayeredDigraphLayout({
+      angle: 90,
       layerSpacing: 40,
+      nodeSpacing: 20,
+      direction: 90,
       columnSpacing: 40,
     }),
+
     model: new go.GraphLinksModel({
       linkKeyProperty: "key",
     }),
   });
-
-  myDiagram.nodeTemplate = $(
-    go.Node,
-    "Auto",
-    {
-      isShadowed: true,
-      shadowBlur: 0,
-      shadowOffset: new go.Point(3.5, 3.5),
-      shadowColor: "rgba(0,0,0,0.3)",
+  myDiagram.themeManager.set("light", {
+    colors: {
+      background: "#fff",
+      text: "#111827",
+      textHighlight: "#11a8cd",
+      subtext: "#6b7280",
+      badge: "#f0fdf4",
+      badgeBorder: "#16a34a33",
+      badgeText: "#15803d",
+      divider: "#6b7280",
+      shadow: "#9ca3af",
+      tooltip: "#1f2937",
+      levels: [
+        "#AC193D",
+        "#2672EC",
+        "#8C0095",
+        "#5133AB",
+        "#008299",
+        "#D24726",
+        "#008A00",
+        "#094AB2",
+      ],
+      dragOver: "#f0f9ff",
+      link: "#ADD8E6",
+      div: "#f3f4f6",
     },
-    $(
-      go.Shape,
-      "RoundedRectangle",
-      {
+    fonts: {
+      name: "500 0.875rem InterVariable, sans-serif",
+      normal: "0.875rem InterVariable, sans-serif",
+      badge: "500 0.75rem InterVariable, sans-serif",
+      link: "600 0.875rem InterVariable, sans-serif",
+    },
+  });
+
+  myDiagram.themeManager.set("dark", {
+    colors: {
+      background: "#111827",
+      text: "#fff",
+      subtext: "#d1d5db",
+      badge: "#22c55e19",
+      badgeBorder: "#22c55e21",
+      badgeText: "#4ade80",
+      shadow: "#111827",
+      dragOver: "#082f49",
+      link: "#ADD8E6",
+      div: "#1f2937",
+    },
+  });
+
+  myDiagram.addDiagramListener("InitialLayoutCompleted", () => {
+    myDiagram.zoomToFit();
+  });
+
+  myDiagram.nodeTemplate = new go.Node("Auto", {
+    isShadowed: true,
+    shadowBlur: 0,
+    layerName: "Foreground",
+    shadowOffset: new go.Point(3.5, 3.5),
+    shadowColor: "black",
+    doubleClick: openlink,
+  })
+    .bind("url", "link")
+    .add(
+      new go.Shape("RoundedRectangle", {
         strokeWidth: 2,
-        fill: "white",
-      },
-      new go.Binding("fill", "completed", (completed) =>
-        completed === 1 ? "#77DD77" : "#44CCFF"
-      )
-    ),
-    $(
-      go.TextBlock,
-      {
+        fill: "#44CCFF",
+        portId: "",
+        fromLinkable: true,
+        fromLinkableSelfNode: false,
+        fromLinkableDuplicates: true,
+        toLinkable: true,
+        toLinkableSelfNode: false,
+        toLinkableDuplicates: true,
+        cursor: "pointer",
+      }).bind("fill", "type", (type) => {
+        if (type === "taken") return "#77DD77";
+        if (type === "rec") return "#FAA0A0";
+        return "C3B1E1";
+      }),
+      new go.TextBlock("Default Text", {
         margin: 15,
-        stroke: "#000",
-        font: "bold 16px sans-serif",
-      },
-      new go.Binding("text", "key")
-    )
-  );
+        stroke: "white",
+        font: "bold 20px sans-serif",
+      }).bind("text", "key")
+    );
 
-  myDiagram.linkTemplate = $(
-    go.Link,
-    {
-      routing: go.Link.Orthogonal,
-      corner: 5,
-    },
-    $(go.Shape, { strokeWidth: 2, stroke: "#555" })
-  );
+  myDiagram.linkTemplate = new go.Link({
+    routing: go.Routing.Orthogonal,
+    layerName: "Background",
+    selectionAdorned: false,
+    corner: 5,
+  }).add(new go.Shape({ strokeWidth: 3 }).theme("stroke", "link")); // the link shape
 
+  function openlink(e, obj) {
+    window.open(obj.url);
+  }
   return myDiagram;
 }
 
@@ -123,7 +185,6 @@ export default function Home() {
     );
 
     const remaining = await getRemainingCourses(degree, completedCourses);
-    setRemainingCourses(remaining);
 
     const nodeDataArray = [];
     const linkDataArray = [];
@@ -133,25 +194,35 @@ export default function Home() {
     let link = 0;
 
     for (const item of remainingCoursesFlat) {
-      nodeDataArray.push({ key: item, completed: 0 });
-      const prerequisites = await prerequisiteInfo(item);
+      if (item) {
+        nodeDataArray.push({ key: item, completed: 0 });
+        const response = await prerequisiteInfo(item);
+        const prerequisites = Object.values(response).flat();
 
-      if (Array.isArray(prerequisites)) {
-        for (const course of prerequisites) {
-          nodeDataArray.push({ key: item, completed: 0 });
-          linkDataArray.push({ from: course, to: item, key: link++ });
+        if (Array.isArray(prerequisites)) {
+          for (const course of prerequisites) {
+            if (course) {
+              nodeDataArray.push({ key: course, completed: 0 });
+              linkDataArray.push({ from: course, to: item, key: link++ });
+            }
+          }
         }
       }
     }
 
     for (const item of completedCourses) {
-      nodeDataArray.push({ key: item, completed: 1 });
-      const prerequisites = await prerequisiteInfo(item);
+      if (item) {
+        nodeDataArray.push({ key: item, completed: 1 });
+        const response = await prerequisiteInfo(item);
+        const prerequisites = Object.values(response).flat();
 
-      if (Array.isArray(prerequisites)) {
-        for (const course of prerequisites) {
-          nodeDataArray.push({ key: item, completed: 1 });
-          linkDataArray.push({ from: course, to: item, key: link++ });
+        if (Array.isArray(prerequisites)) {
+          for (const course of prerequisites) {
+            if (course) {
+              nodeDataArray.push({ key: course, completed: 1 });
+              linkDataArray.push({ from: course, to: item, key: link++ });
+            }
+          }
         }
       }
     }
@@ -159,6 +230,7 @@ export default function Home() {
     setNodeDataArray(nodeDataArray);
     setLinkDataArray(linkDataArray);
 
+    setRemainingCourses(remaining);
     remainingCoursesRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -232,14 +304,24 @@ export default function Home() {
 }
 
 const RenderGraph = ({ nodeDataArray, linkDataArray }) => {
+  const diagramRef = useRef();
+
+  useEffect(() => {
+    if (diagramRef.current) {
+      const diagram = diagramRef.current.getDiagram();
+      if (diagram) {
+        diagram.zoomToFit(); // Fit content when data changes
+      }
+    }
+  }, [nodeDataArray, linkDataArray]);
+
   return (
-    <div style={{ width: "100%", height: "500px", border: "1px solid #ccc" }}>
+    <div>
       <ReactDiagram
         initDiagram={initDiagram}
         divClassName="diagram-component"
         nodeDataArray={nodeDataArray}
         linkDataArray={linkDataArray}
-        className="h-full w-full"
       />
     </div>
   );
