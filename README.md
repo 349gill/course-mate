@@ -9,7 +9,7 @@ A website that allows you to plan your Computing Science degree at the Universit
 ## Prerequisites API
 
 The API provides access to a function that finds the prerequisites and corequisites of a given course.  
-To use this API, fetch `https://course-mate-rouge.vercel.app/api/` followed by the subject name and course ID, separated by **%20**.
+To use this API, fetch `https://course-mate-rouge.vercel.app/api/` followed by the subject name and course ID, separated by **%20**
 
 Alternatively, encode the course name into a URI before using it in the link.
 
