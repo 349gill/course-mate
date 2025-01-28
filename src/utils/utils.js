@@ -51,11 +51,6 @@ export const prerequisiteInfo = async (course) => {
 
 export const initDiagram = () => {
   const myDiagram = new go.Diagram({
-    viewSize: new go.Size(1200, 500),
-
-    allowRelink: false,
-    allowLink: false,
-
     "undoManager.isEnabled": true,
     layout: new go.GridLayout({
       angle: 90,
@@ -64,11 +59,22 @@ export const initDiagram = () => {
       direction: 90,
       columnSpacing: 50,
     }),
+    initialContentAlignment: go.Spot.Center,
+    contentAlignment: go.Spot.Center,
+    'animationManager.isEnabled': false,
+    isReadOnly: true,
+    initialScale: 1.0,
+    minScale: 0.25,  // minimum 25% zoom
+    maxScale: 2.0,   // maximum 200% zoom
+    'toolManager.mouseWheelBehavior': go.ToolManager.WheelZoom,
 
+    allowRelink: false,
+    allowLink: false,
     model: new go.GraphLinksModel({
       linkKeyProperty: "key",
     }),
   });
+
   myDiagram.themeManager.set("light", {
     colors: {
       background: "#fff",
@@ -118,8 +124,14 @@ export const initDiagram = () => {
     },
   });
 
-  myDiagram.addDiagramListener("InitialLayoutCompleted", () => {
-    myDiagram.zoomToFit();
+  myDiagram.addDiagramListener("InitialLayoutCompleted", (e) => {
+    const diagram = e.diagram;
+    diagram.zoomToFit();
+  
+    if (diagram.scale < 0.25) diagram.scale = 0.25;
+    if (diagram.scale > 2) diagram.scale = 2;
+    
+    diagram.contentAlignment = go.Spot.Center;
   });
 
   myDiagram.nodeTemplate = new go.Node("Auto", {
@@ -165,5 +177,6 @@ export const initDiagram = () => {
   function openlink(e, obj) {
     window.open(obj.url);
   }
+
   return myDiagram;
 };

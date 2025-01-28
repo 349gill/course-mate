@@ -116,12 +116,15 @@ export default function Home() {
 
       <br />
 
+      <div className="w-full border-2 border-gray-300 rounded-lg overflow-hidden" style={{ height: '500px' }}>
       {!isLoading && (
         <RenderGraph
           nodeDataArray={nodeDataArray}
           linkDataArray={linkDataArray}
         />
       )}
+      </div>
+
     </div>
   );
 }
