@@ -2,8 +2,10 @@
 
 A website that allows you to plan your Computing Science degree at the University of Alberta.
 
-<img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="300">
-<img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="300">
+<div align="left" style="display: flex; flex-flow: row nowrap; width: 100%;">
+  <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="500">
+  <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="500">
+</div>
 
 - Input your completed courses list.
 - Obtain the remaining requirements for your degree.
