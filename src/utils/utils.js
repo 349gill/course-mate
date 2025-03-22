@@ -62,7 +62,7 @@ export const initDiagram = () => {
     initialContentAlignment: go.Spot.Center,
     contentAlignment: go.Spot.Center,
     'animationManager.isEnabled': false,
-    isReadOnly: true,
+    isReadOnly: false,
     initialScale: 1.0,
     minScale: 0.25,  // minimum 25% zoom
     maxScale: 2.0,   // maximum 200% zoom
