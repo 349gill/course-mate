@@ -1,9 +1,11 @@
 <h2>CourseMate</h2>
 <p>A website that allows you to plan your Computing Science degree at the University of Alberta.</p>
 
-<div style="display: flex; flex-direction: row; justify-content: space-between;">
-  <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="50%">
-  <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="50%">
+<div style="width: 100%;">
+  <div style="display: flex;">
+    <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" style="width: 50%;">
+    <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" style="width: 50%;">
+  </div>
 </div>
 
 <ul>
