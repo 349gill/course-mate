@@ -2,12 +2,12 @@
 
 A website that allows you to plan your Computing Science degree at the University of Alberta.
 
-<div style="display: flex">
-  <div>
-    <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="100px">
+<div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; width: 100%;">
+  <div style="grid-column: span 6; text-align: center;">
+    <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="100%">
   </div>
-  <div>
-    <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="100px">
+  <div style="grid-column: span 6; text-align: center;">
+    <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="100%">
   </div>
 </div>
 
