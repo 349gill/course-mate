@@ -1,19 +1,20 @@
-## CourseMate
+<h2>CourseMate</h2>
+<p>A website that allows you to plan your Computing Science degree at the University of Alberta.</p>
 
-A website that allows you to plan your Computing Science degree at the University of Alberta.
-
-<div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; width: 100%;">
-  <div style="grid-column: span 6; text-align: center;">
-    <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="100%">
+<div style="display: flex">
+  <div>
+    <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="100px">
   </div>
-  <div style="grid-column: span 6; text-align: center;">
-    <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="100%">
+  <div>
+    <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="100px">
   </div>
 </div>
 
-- Input your completed courses list.
-- Obtain the remaining requirements for your degree.
-- Uses GoJS to illustrate the hierarchy of remaining and completed courses.
+<ul>
+  <li>Input your completed courses list.</li>
+  <li>Obtain the remaining requirements for your degree.</li>
+  <li>Uses GoJS to illustrate the hierarchy of remaining and completed courses.</li>
+</ul>
 
 ## Prerequisites API
 
