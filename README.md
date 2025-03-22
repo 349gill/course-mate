@@ -1,9 +1,11 @@
-## CourseMate
+<img width="1136" alt="image" src="https://github.com/user-attachments/assets/3cfd9269-9ac7-49f4-8f30-58d2094a1687" />## CourseMate
 
 A website that allows you to plan your Computing Science degree at the University of Alberta.
 
-<img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true" width="60%">
-<img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true" width="60%">
+<div align="left" style="display: flex; flex-flow: row nowrap; width: 100%;">
+  <img src="https://github.com/349gill/course-mate/blob/main/lib/menu.png?raw=true">
+  <img src="https://github.com/349gill/course-mate/blob/main/lib/result.png?raw=true">
+</div>
 
 - Input your completed courses list.
 - Obtain the remaining requirements for your degree.
