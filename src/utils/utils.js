@@ -49,15 +49,62 @@ export const prerequisiteInfo = async (course) => {
   }
 };
 
+// Extract individual course codes (e.g. "CMPUT 204") from raw prerequisite
+// sentences like "CMPUT 175 or 275, and CMPUT 272" or
+// "one of MATH 100, 114, 117, 134, 144, or 154".
+// Bare numbers inherit the most recently seen subject.
+const CONNECTOR_WORDS = new Set([
+  "AND",
+  "OR",
+  "NOR",
+  "ONE",
+  "TWO",
+  "OF",
+  "THE",
+  "FOR",
+  "IN",
+  "WITH",
+  "FROM",
+  "EITHER",
+  "NEITHER",
+  "BOTH",
+  "EACH",
+  "ANY",
+  "ALL",
+  "AN",
+  "A",
+]);
+export const parseCourseCodes = (raw) => {
+  if (!raw) return [];
+  const text = String(raw).toUpperCase();
+  const results = [];
+  let lastSubject = null;
+  const re = /([A-Z]{2,6})?\s*(\d{3}[A-Z]?)/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    let subject = m[1] || null;
+    const num = m[2];
+    if (subject && CONNECTOR_WORDS.has(subject)) subject = null;
+    subject = subject || lastSubject;
+    if (!subject) continue;
+    // Don't let connectors become the remembered subject
+    if (!CONNECTOR_WORDS.has(subject)) lastSubject = subject;
+    if (subject.length >= 2 && subject.length <= 6) {
+      const code = `${subject} ${num}`;
+      if (!results.includes(code)) results.push(code);
+    }
+  }
+  return results;
+};
+
 export const initDiagram = () => {
   const myDiagram = new go.Diagram({
     "undoManager.isEnabled": true,
-    layout: new go.GridLayout({
-      angle: 90,
-      layerSpacing: 50,
-      nodeSpacing: 0,
+    layout: new go.LayeredDigraphLayout({
       direction: 90,
-      columnSpacing: 50,
+      layerSpacing: 50,
+      columnSpacing: 30,
+      setsPortSpots: false,
     }),
     initialContentAlignment: go.Spot.Center,
     contentAlignment: go.Spot.Center,
@@ -98,7 +145,7 @@ export const initDiagram = () => {
         "#094AB2",
       ],
       dragOver: "#f0f9ff",
-      link: "#ADD8E6",
+      link: "#0284c7",
       div: "#f3f4f6",
     },
     fonts: {
@@ -119,10 +166,12 @@ export const initDiagram = () => {
       badgeText: "#4ade80",
       shadow: "#111827",
       dragOver: "#082f49",
-      link: "#ADD8E6",
+      link: "#38bdf8",
       div: "#1f2937",
     },
   });
+
+  myDiagram.themeManager.currentTheme = "light";
 
   myDiagram.addDiagramListener("InitialLayoutCompleted", (e) => {
     const diagram = e.diagram;
@@ -158,7 +207,7 @@ export const initDiagram = () => {
       }).bind("fill", "completed", (completed) => {
         if (completed === 0) return "#77DD77";
         if (completed === 1) return "#FAA0A0";
-        return "C3B1E1";
+        return "#C3B1E1";
       }),
       new go.TextBlock("Default Text", {
         margin: 15,
@@ -169,10 +218,22 @@ export const initDiagram = () => {
 
   myDiagram.linkTemplate = new go.Link({
     routing: go.Routing.Orthogonal,
-    layerName: "Background",
     selectionAdorned: false,
     corner: 5,
-  }).add(new go.Shape({ strokeWidth: 3 }).theme("stroke", "link"));
+    toShortLength: 4,
+    fromSpot: go.Spot.Bottom,
+    toSpot: go.Spot.Top,
+  })
+    .add(
+      new go.Shape({ strokeWidth: 2.5, stroke: "#0284c7" }).theme(
+        "stroke",
+        "link"
+      ),
+      new go.Shape({ toArrow: "Standard", strokeWidth: 0, fill: "#0284c7" }).theme(
+        "fill",
+        "link"
+      )
+    );
 
   function openlink(e, obj) {
     window.open(obj.url);

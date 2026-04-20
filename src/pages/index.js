@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { getRemainingCourses, prerequisiteInfo } from "../utils/utils";
+import { getRemainingCourses, prerequisiteInfo, parseCourseCodes } from "../utils/utils";
+import topologicalSort from "../../lib/topologicalSort";
 
 import DegreeForm from "../components/DegreeForm";
 import RenderGraph from "../components/RenderGraph";
@@ -54,23 +55,46 @@ export default function Home() {
 
       const remainingCoursesFlat = Object.values(remaining).flat();
 
+      const seenNodes = new Set();
+      const seenLinks = new Set();
+      const prereqMap = {};
       let link = 0;
       for (const item of remainingCoursesFlat) {
         if (item) {
-          nodeDataArray.push({ key: item, completed: 0 });
+          if (!seenNodes.has(item)) {
+            seenNodes.add(item);
+            nodeDataArray.push({ key: item, completed: 0 });
+          }
           const response = await prerequisiteInfo(item);
-          const prerequisites = Object.values(response).flat();
+          const rawPrereqs = Object.values(response || {}).flat().filter(Boolean);
+          // Raw entries are sentences ("CMPUT 175 or 275"); split into codes
+          const prerequisites = rawPrereqs.flatMap((entry) => parseCourseCodes(entry));
+          prereqMap[item] = prerequisites;
 
           if (Array.isArray(prerequisites)) {
             for (const course of prerequisites) {
               if (course) {
-                nodeDataArray.push({ key: course, completed: 0 });
-                linkDataArray.push({ from: course, to: item, key: link++ });
+                if (!seenNodes.has(course)) {
+                  seenNodes.add(course);
+                  nodeDataArray.push({ key: course, completed: 0 });
+                }
+                const linkId = `${course}->${item}`;
+                if (!seenLinks.has(linkId)) {
+                  seenLinks.add(linkId);
+                  linkDataArray.push({ from: course, to: item, key: link++ });
+                }
               }
             }
           }
         }
       }
+
+      const order = topologicalSort(prereqMap);
+      const rank = new Map(order.map((course, i) => [course, i]));
+      nodeDataArray.sort(
+        (a, b) =>
+          (rank.get(a.key) ?? Infinity) - (rank.get(b.key) ?? Infinity)
+      );
 
       setNodeDataArray(nodeDataArray);
       setLinkDataArray(linkDataArray);

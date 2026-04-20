@@ -49,6 +49,7 @@ const RenderGraph = ({ nodeDataArray, linkDataArray }) => {
         divClassName="diagram-component h-full w-full"
         nodeDataArray={nodeDataArray}
         linkDataArray={linkDataArray}
+        skipsDiagramUpdate={false}
       />
     </div>
   );
