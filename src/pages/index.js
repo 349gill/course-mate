@@ -59,6 +59,7 @@ export default function Home() {
       const seenLinks = new Set();
       const prereqMap = {};
       let link = 0;
+      // Implement batching or rate limiting for prerequisite fetching requests.
       for (const item of remainingCoursesFlat) {
         if (item) {
           if (!seenNodes.has(item)) {
