@@ -236,7 +236,9 @@ export const initDiagram = () => {
     );
 
   function openlink(e, obj) {
-    window.open(obj.url);
+    if (obj.url && typeof obj.url === 'string' && obj.url.startsWith('https://apps.ualberta.ca/')) {
+      window.open(obj.url);
+    }
   }
 
   return myDiagram;
